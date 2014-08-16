@@ -34,11 +34,11 @@ QUIET_FILENAME = "quiet.wav"
 GOOD_DOG1_FILENAME = "good_dogs1.wav"
 GOOD_DOG2_FILENAME = "good_dogs2.wav"
 
-MIN_RESPONSE_INTERVAL_SECS = 5 
-MAX_RESPONSE_INTERVAL_SECS = 30 * 60
-RESPONSE_DELAY_RATE = 1.6
+MIN_RESPONSE_INTERVAL_SECS = 10 
+MAX_RESPONSE_INTERVAL_SECS = 30 
+RESPONSE_DELAY_RATE = 1.6 
 
-THRESHOLD = 10000
+THRESHOLD = 7500
 
 if sys.platform == 'darwin':
     CHANNELS = 1
@@ -82,19 +82,18 @@ def respond_to_current_activity(dogs_were_quiet, dogs_are_barking, seconds_quiet
     global wf,response_data, seconds_until_reward, wav_variation
 
     if dogs_were_quiet and dogs_are_barking: 
-        wf = quiet_wav
-        wf.rewind()
-        response_data = wf.readframes(CHUNK)
-        print "BE QUIET!"
+#        wf = quiet_wav
+#        wf.rewind()
+#        response_data = wf.readframes(CHUNK)
+        print "%s BE QUIET!" % time.strftime("%H:%M:%S")
 
     elif seconds_quiet > seconds_until_reward:
         wav_variation = (wav_variation + 1) % len(good_dog_wavs) 
         wf = good_dog_wavs[wav_variation]
         wf.rewind()
         response_data = wf.readframes(CHUNK)
-        print "%s GOOD DOG!" % time.strftime("%H:%M:%S")
-        if seconds_until_reward < MAX_RESPONSE_INTERVAL_SECS:
-            seconds_until_reward *= RESPONSE_DELAY_RATE
+        print "%s GOOD DOG! %s/%s" % (time.strftime("%H:%M:%S"), seconds_quiet, seconds_until_reward)
+        seconds_until_reward += MAX_RESPONSE_INTERVAL_SECS
 
 def log_noise_level(volume, seconds_quiet):
     if DEBUG:
